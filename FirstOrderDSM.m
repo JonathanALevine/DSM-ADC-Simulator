@@ -3,6 +3,10 @@ clear; %intialization
 
 set(0,'DefaultFigureWindowStyle','docked')
 
+global n_bits VFS;
+n_bits = 8;
+VFS = 2*(1);
+
 % Simulation settings 
 save_plots = 0;
 
@@ -13,7 +17,7 @@ clock_period = 1/clock_frequency;
 start_time = 0*clock_period;
 end_time = 100*clock_period;
 
-clock_num_points = 1000;
+clock_num_points = 1000000;
 clock_times = linspace(start_time, end_time, clock_num_points);
 
 input_sequence = myInputSequence(clock_times);
@@ -25,7 +29,7 @@ hold_state = 0;
 hold_val = samples(1);
 for i=2:length(clock_times)
     if clock(i) == 1 && hold_state == 0
-        digitized_version = adc(input_sequence(i));
+        digitized_version = adc(input_sequence(i))
         samples(i) = dac(digitized_version);
         hold_val = samples(i);
         hold_state = 1;
@@ -54,7 +58,7 @@ ylabel('Clock (V)')
 subplot(3, 1, 3)
 plot(clock_times/1e-6, samples)
 xlabel('Time (\mus)')
-ylabel('Digitized Signal (V)') 
+ylabel('Digitized Signal (From  (V)') 
 
 % if save_plots
 %     FN2 = 'Figures/time_domains_non_linear_adc';   

@@ -1,9 +1,12 @@
 function [digital_out] = adc(analog_in)
+
+    global n_bits VFS;
+
     digital_out = "";
-    VFS = 2*(7);
+    VFS = 2*(1);
     % 8-Bit ADC means 2^8 = 256 levels
-    for i=7:-1:0
-        VLSB = 1*VFS/(2^8);
+    for i=(n_bits-1):-1:0
+        VLSB = 1*VFS/(2^(n_bits));
         check_val = VLSB*(2^i);
         if analog_in > check_val
             digital_out = digital_out + "1";
