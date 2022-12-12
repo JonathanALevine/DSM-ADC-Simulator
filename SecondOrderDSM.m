@@ -13,6 +13,8 @@ sampling_rate = 200*1e6;
 clock_frequency = sampling_rate;
 clock_period = 1/clock_frequency;
 
+OSR = sampling_rate / (2.5*1e6);
+
 start_time = 0*clock_period;
 end_time = 1000*clock_period;
 
@@ -20,8 +22,8 @@ clock_num_points = 1000000;
 clock_times = linspace(start_time, end_time, clock_num_points);
 
 input_sequence = myInputSequence(clock_times);
-input_sequence = decimate(input_sequence, 80);
-clock_times = decimate(clock_times, 80);
+input_sequence = decimate(input_sequence, OSR);
+clock_times = decimate(clock_times, OSR);
 clock = myClock(clock_times, clock_frequency);
 
 outputs = zeros(1, length(clock_times));
@@ -52,44 +54,52 @@ end
 % and the integrator previous val
 vref = 0;
 prev_val = 0;
+prev_val_2 = 0;
 hold_state = 0;
 hold_val = outputs(1);
 for i=2:length(clock_times)
     delta_val = difference_amp(input_sequence(i), vref);
     integrator_val = integrator(delta_val, prev_val);
-    digitized_val = adc(integrator_val, 2);
     prev_val = integrator_val;
+    
+    delta_val = difference_amp(integrator_val, vref);
+    integrator_val = integrator(delta_val, prev_val_2);
+    prev_val_2 = integrator_val;
+
+    digitized_val = adc(integrator_val, 2);
+    
+
     vref = digitizer(digitized_val);
+
     outputs(i) = digitizer(digitized_val);
-    hold_val = outputs(i);
-    hold_state = 1;
 end
 
+num_to_show = length(clock_times)/5;
 figure(1)
 subplot(4, 1, 1)
-plot(clock_times/1e-6, input_sequence)
+plot(clock_times(1:num_to_show)/1e-6, input_sequence(1:num_to_show))
 xlabel('Time (\mus)')
 ylabel('Input Signal (V)')
 
 subplot(4, 1, 2)
-plot(clock_times/1e-6, clock)
+plot(clock_times(1:num_to_show)/1e-6, clock(1:num_to_show))
 xlabel('Time (\mu s)')
 ylabel('Clock (V)') 
 
 subplot(4, 1, 3)
-plot(clock_times/1e-6, adc_samples)
+plot(clock_times(1:num_to_show)/1e-6, adc_samples(1:num_to_show))
 xlabel('Time (\mus)')
 ylabel('8-Bit ADC (V)') 
 
 subplot(4, 1, 4)
-stairs(outputs(1:1000))
+stairs(outputs(1:num_to_show))
 xlabel('Time (\mus)')
-ylabel('DSM ADC (V)') 
+ylabel('DSM ADC (V)')
 
-% if save_plots
-%     FN2 = 'Figures/time_domains_non_linear_adc';   
-%     print(gcf, '-dpng', '-r600', FN2);  %Save graph in PNG
-% end
+if save_plots
+    FN2 = 'Figures/time_domains_second_order';   
+    print(gcf, '-dpng', '-r600', FN2);  %Save graph in PNG
+end
 
 figure(2)
 L = length(outputs);
@@ -105,11 +115,12 @@ xlabel("Frequency (Hz)")
 ylabel("Signal Power (dB)")
 
 SNR = getSNR(P1)
+SNR_Theoretical = 6.02*2 + 1.76 - -12.9 + 50*log10(OSR)
 SFDR = getSFDR(P1)
 SINAD = getSINAD(P1)
 ENOB = getENOB(SINAD)
 
-% if save_plots
-%     FN2 = 'Figures/fft_partA';   
-%     print(gcf, '-dpng', '-r600', FN2);  %Save graph in PNG
-% end
+if save_plots
+    FN2 = 'Figures/fft_second_order';   
+    print(gcf, '-dpng', '-r600', FN2);  %Save graph in PNG
+end
