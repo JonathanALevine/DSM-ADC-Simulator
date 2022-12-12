@@ -14,12 +14,14 @@ clock_frequency = sampling_rate;
 clock_period = 1/clock_frequency;
 
 start_time = 0*clock_period;
-end_time = 100*clock_period;
+end_time = 1000*clock_period;
 
-clock_num_points = 1000;
+clock_num_points = 1000000;
 clock_times = linspace(start_time, end_time, clock_num_points);
 
 input_sequence = myInputSequence(clock_times);
+input_sequence = decimate(input_sequence, 80);
+clock_times = decimate(clock_times, 80);
 clock = myClock(clock_times, clock_frequency);
 
 outputs = zeros(1, length(clock_times));
@@ -47,11 +49,11 @@ end
 
 % DSM ADC Block
 % Initialize the reference voltage
+% and the integrator previous val
 vref = 0;
 prev_val = 0;
-
 hold_state = 0;
-hold_val = outputs(i);
+hold_val = outputs(1);
 for i=2:length(clock_times)
     delta_val = difference_amp(input_sequence(i), vref);
     integrator_val = integrator(delta_val, prev_val);
@@ -62,9 +64,6 @@ for i=2:length(clock_times)
     hold_val = outputs(i);
     hold_state = 1;
 end
-
-mean(outputs)
-mean(adc_samples)
 
 figure(1)
 subplot(4, 1, 1)
@@ -83,7 +82,6 @@ xlabel('Time (\mus)')
 ylabel('8-Bit ADC (V)') 
 
 subplot(4, 1, 4)
-% plot(clock_times(1:100)/1e-6, outputs(1:100))
 stairs(outputs(1:1000))
 xlabel('Time (\mus)')
 ylabel('DSM ADC (V)') 
@@ -93,24 +91,23 @@ ylabel('DSM ADC (V)')
 %     print(gcf, '-dpng', '-r600', FN2);  %Save graph in PNG
 % end
 
-% figure(2)
-% L = 8192;
-% Y = fft(samples, L);
-% P2 = abs(Y/L);
-% P1 = P2(1:L/2+1);
-% P1(2:end-1) = 2*P1(2:end-1);
-% f = clock_frequency*(0:(L/2))/L;
-% 
-% stem(f(1:100)/1e5,(P1(1:100))) 
-% title("Amplitude Spectrum of Sampled Signal")
-% xlabel("Frequency (MHz)")
-% ylabel("Signal Power (V)")
-% 
-% SNR = getSNR(P1)
-% % ideal_SNR = 6.02*8-1.76
-% SFDR = getSFDR(P1)
-% SINAD = getSINAD(P1)
-% ENOB = getENOB(SINAD)
+figure(2)
+L = length(outputs);
+Y = fft(outputs, L);
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+f = clock_frequency*(0:(L/2))/L;
+
+semilogx(f,10*log10(P1)) 
+title("Amplitude Spectrum of Sampled Signal")
+xlabel("Frequency (Hz)")
+ylabel("Signal Power (dB)")
+
+SNR = getSNR(P1)
+SFDR = getSFDR(P1)
+SINAD = getSINAD(P1)
+ENOB = getENOB(SINAD)
 
 % if save_plots
 %     FN2 = 'Figures/fft_partA';   
