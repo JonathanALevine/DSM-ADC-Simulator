@@ -1,5 +1,5 @@
 function [val] = getSFDR(power_vals)
-    VFS = 2*(7);
+    global VFS;
     VFS_dB = 20*log10(VFS);
     max_spur = 0;
     for i=1:length(power_vals)

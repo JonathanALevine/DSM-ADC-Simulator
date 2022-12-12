@@ -1,5 +1,6 @@
 function [sequence] = myInputSequence(clock_times)
-    fundamental = 2.5*1e6;
+%     fundamental = 2.5*1e6;
+    fundamental = 0;
 
     power_fundamental = 1;
 
