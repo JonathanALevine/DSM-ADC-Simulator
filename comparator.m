@@ -1,9 +1,18 @@
-function [digital_out] = comparator(integrator_val)
-%     NEED TO MAKE THIS A TWO BIT ADC
-    if integrator_val < 0
-        digital_out = "0";
-    else
-        digital_out = "1";
+function [digital_out] = comparator(analog_in)
+    global VFS;
+    digital_out = "";
+    n_bits = 2;
+    VFS = 2*(1);
+    % 8-Bit ADC means 2^8 = 256 levels
+    for i=(n_bits-1):-1:0
+        VLSB = 1*VFS/(2^(n_bits));
+        check_val = VLSB*(2^i);
+        if analog_in > check_val
+            digital_out = digital_out + "1";
+            analog_in = analog_in - check_val;
+        else
+            digital_out = digital_out + "0";
+        end
     end
     return;
 end

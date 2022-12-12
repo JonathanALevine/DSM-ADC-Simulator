@@ -30,7 +30,7 @@ hold_state = 0;
 hold_val = adc_samples(1);
 for i=2:length(clock_times)
     if clock(i) == 1 && hold_state == 0
-        digitized_version = adc(input_sequence(i));
+        digitized_version = adc(input_sequence(i), 8);
         adc_samples(i) = dac(digitized_version);
         hold_val = adc_samples(i);
         hold_state = 1;
@@ -55,7 +55,7 @@ hold_val = outputs(i);
 for i=2:length(clock_times)
     delta_val = difference_amp(input_sequence(i), vref);
     integrator_val = integrator(delta_val, prev_val);
-    digitized_val = comparator(integrator_val);
+    digitized_val = adc(integrator_val, 2);
     prev_val = integrator_val;
     vref = digitizer(digitized_val);
     outputs(i) = digitizer(digitized_val);
