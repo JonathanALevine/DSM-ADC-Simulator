@@ -76,22 +76,17 @@ end
 
 num_to_show = length(clock_times)/5;
 figure(1)
-subplot(4, 1, 1)
+subplot(3, 1, 1)
 plot(clock_times(1:num_to_show)/1e-6, input_sequence(1:num_to_show))
 xlabel('Time (\mus)')
 ylabel('Input Signal (V)')
 
-subplot(4, 1, 2)
+subplot(3, 1, 2)
 plot(clock_times(1:num_to_show)/1e-6, clock(1:num_to_show))
 xlabel('Time (\mu s)')
 ylabel('Clock (V)') 
 
-subplot(4, 1, 3)
-plot(clock_times(1:num_to_show)/1e-6, adc_samples(1:num_to_show))
-xlabel('Time (\mus)')
-ylabel('8-Bit ADC (V)') 
-
-subplot(4, 1, 4)
+subplot(3, 1, 3)
 stairs(outputs(1:num_to_show))
 xlabel('Time (\mus)')
 ylabel('DSM ADC (V)')
