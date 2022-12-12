@@ -22,8 +22,8 @@ clock_times = linspace(start_time, end_time, clock_num_points);
 input_sequence = myInputSequence(clock_times);
 clock = myClock(clock_times, clock_frequency);
 
+outputs = zeros(1, length(clock_times));
 adc_samples = zeros(1, length(clock_times));
-samples = zeros(1, length(clock_times));
 
 % ADC Block
 hold_state = 0;
@@ -45,35 +45,26 @@ for i=2:length(clock_times)
     end
 end
 
-% for i=2:length(clock_times)
-%     
-% end
-
 % DSM ADC Block
-hold_state = 0;
-hold_val = samples(1);
-n_bits = 8;
 % Initialize the reference voltage
 vref = 0;
+prev_val = 0;
+
+hold_state = 0;
+hold_val = outputs(i);
 for i=2:length(clock_times)
-    if clock(i) == 1 && hold_state == 0
-        delta_val = difference_amp(input_sequence(i), vref)
-        
-%         digitized_version = adc(delta_val);
-%         samples(i) = dac(digitized_version);
-%         hold_val = samples(i);
-%         hold_state = 1;
-%         vref = dac(digitized_version);
-    end
-    if clock(i) == 0
-%         samples(i) = hold_val;
-%         hold_state = 0;
-%         hold_val = samples(i);
-    end
-    if hold_state == 1
-%         samples(i) = hold_val;
-    end
+    delta_val = difference_amp(input_sequence(i), vref);
+    integrator_val = integrator(delta_val, prev_val);
+    digitized_val = comparator(integrator_val);
+    prev_val = integrator_val;
+    vref = digitizer(digitized_val);
+    outputs(i) = digitizer(digitized_val);
+    hold_val = outputs(i);
+    hold_state = 1;
 end
+
+mean(outputs)
+mean(adc_samples)
 
 figure(1)
 subplot(4, 1, 1)
@@ -92,7 +83,8 @@ xlabel('Time (\mus)')
 ylabel('8-Bit ADC (V)') 
 
 subplot(4, 1, 4)
-plot(clock_times/1e-6, samples)
+% plot(clock_times(1:100)/1e-6, outputs(1:100))
+stairs(outputs(1:1000))
 xlabel('Time (\mus)')
 ylabel('DSM ADC (V)') 
 
