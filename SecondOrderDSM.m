@@ -109,19 +109,6 @@ title("Amplitude Spectrum of Sampled Signal")
 xlabel("Frequency (Hz)")
 ylabel("Signal Power (dB)")
 
-% figure(3)
-% L = length(outputs);
-% Y = fft(outputs, L);
-% P2 = abs(Y/L);
-% P1 = P2(1:L/2+1);
-% P1(2:end-1) = 2*P1(2:end-1);
-% f = clock_frequency*(0:(L/2))/L;
-% 
-% plot(f, P1)
-% title("Amplitude Spectrum of Sampled Signal")
-% xlabel("Frequency (Hz)")
-% ylabel("Signal Power (V)")
-
 SNR = getSNR(P1)
 SNR_Theoretical = 6.02*2 + 1.76 - -12.9 + 50*log10(OSR)
 SFDR = getSFDR(P1)
