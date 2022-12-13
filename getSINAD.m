@@ -17,6 +17,6 @@ function [val] = getSINAD(power_vals)
         end
     end
     avg_noise = noise/num_noise;
-    M = 8192;
+    M = length(power_vals);
     val = 20*log10((signal+avg_noise)/avg_noise) - 10*log10(M/2);
 end
