@@ -4,7 +4,7 @@ clear; %intialization
 set(0,'DefaultFigureWindowStyle','docked')
 
 global VFS;
-VFS = 2*(1);
+VFS = 2*(4);
 
 % Simulation settings 
 save_plots = 0;
