@@ -80,13 +80,8 @@ plot(clock_times(1:num_to_show)/1e-6, clock(1:num_to_show))
 xlabel('Time (\mu s)')
 ylabel('Clock (V)') 
 
-% subplot(4, 1, 3)
-% plot(clock_times(1:num_to_show)/1e-6, adc_samples(1:num_to_show))
-% xlabel('Time (\mus)')
-% ylabel('8-Bit ADC (V)') 
-
 subplot(3, 1, 3)
-stairs(outputs(1:num_to_show))
+stairs(clock_times(1:num_to_show)/1e-6, outputs(1:num_to_show))
 xlabel('Time (\mus)')
 ylabel('DSM ADC (V)')
 
